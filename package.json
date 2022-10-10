@@ -1,5 +1,5 @@
 {
-    "name": "Yugabyte-YSQL",
+    "name": "YugabyteDB-YSQL",
     "version": "0.1.2",
     "versionDate": "2022-10-10",
     "author": "hackolade",
@@ -9,8 +9,8 @@
     },
     "contributes": {
         "target": {
-            "applicationTarget": "Yugabyte-YSQL",
-            "title": "Yugabyte YSQL",
+            "applicationTarget": "YugabyteDB-YSQL",
+            "title": "YugabyteDB YSQL",
             "versions": [
                 "v2.x"
             ]
@@ -38,10 +38,6 @@
             "FEScriptCommentsSupported": true,
             "enableFetchSystemEntitiesCheckbox": true
         }
-    },
-    "scripts": {
-        "sync": "echo $PWD; rsync -ar ./ $HOME/.hackolade/plugins/YugabyteDB-YSQL",
-        "hck": "Hackolade"
     },
     "description": "Hackolade plugin for YugabyteDB-YSQL",
     "icon_url": "logo.jpg",
