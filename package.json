@@ -1,6 +1,10 @@
 {
     "name": "YugabyteDB-YSQL",
+<<<<<<< HEAD
     "version": "0.2.10",
+=======
+    "version": "0.2.14",
+>>>>>>> develop
     "author": "hackolade",
     "engines": {
         "hackolade": "7.7.10",
@@ -79,6 +83,10 @@
         "lint-staged": "14.0.1",
         "prettier": "3.2.5",
         "simple-git-hooks": "2.11.1"
+<<<<<<< HEAD
     },
     "release": true
+=======
+    }
+>>>>>>> develop
 }
