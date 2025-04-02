@@ -53,7 +53,6 @@
 					"hasMaxLength": true
 				}
 			},
-			,
 			{
 				"from": {
 					"mode": "varbit",
