@@ -1,5 +1,3 @@
-'use strict';
-
 const { createLogger } = require('./helpers/loggerHelper');
 const postgresService = require('./helpers/postgresService');
 
@@ -15,8 +13,6 @@ module.exports = {
 		const sshService = app.require('@hackolade/ssh-service');
 
 		try {
-			logInfo('Test connection', connectionInfo, logger);
-
 			const postgresLogger = createLogger({
 				title: 'Test connection instance log',
 				hiddenKeys: connectionInfo.hiddenKeys,
@@ -38,8 +34,6 @@ module.exports = {
 
 	async getDatabases(connectionInfo, logger, cb, app) {
 		try {
-			logInfo('Get databases', connectionInfo, logger);
-
 			const sshService = app.require('@hackolade/ssh-service');
 			const postgresLogger = createLogger({
 				title: 'Get DB names',
@@ -68,8 +62,6 @@ module.exports = {
 		const sshService = app.require('@hackolade/ssh-service');
 
 		try {
-			logInfo('Get DB table names', connectionInfo, logger);
-
 			const postgresLogger = createLogger({
 				title: 'Get DB collections names',
 				hiddenKeys: connectionInfo.hiddenKeys,
@@ -116,8 +108,6 @@ module.exports = {
 		const sshService = app.require('@hackolade/ssh-service');
 
 		try {
-			logger.log('info', data, 'Retrieve tables data:', data.hiddenKeys);
-
 			const postgresLogger = createLogger({
 				title: 'Get DB collections data log',
 				hiddenKeys: data.hiddenKeys,
@@ -215,11 +205,6 @@ const prepareError = error => {
 	error = JSON.stringify(error, Object.getOwnPropertyNames(error));
 	error = JSON.parse(error);
 	return error;
-};
-
-const logInfo = (step, connectionInfo, logger) => {
-	logger.clear();
-	logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
 };
 
 const orderPackages = packages => {
