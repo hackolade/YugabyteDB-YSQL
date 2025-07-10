@@ -6,7 +6,12 @@ module.exports = ({
 	wrapInQuotes,
 	getColumnsList,
 }) => {
-	const generateConstraintsString = (dividedConstraints, isParentActivated) => {
+	const generateConstraintsString = ({
+		dividedConstraints,
+		isParentActivated,
+		activatedConstraintsPrefix = ',\n\t',
+		deactivatedConstraintsPrefix = '\n\t',
+	}) => {
 		const deactivatedItemsAsString = commentIfDeactivated(
 			(dividedConstraints?.deactivatedItems || []).join(',\n\t'),
 			{
@@ -15,11 +20,11 @@ module.exports = ({
 			},
 		);
 		const activatedConstraints = dividedConstraints?.activatedItems?.length
-			? ',\n\t' + dividedConstraints.activatedItems.join(',\n\t')
+			? activatedConstraintsPrefix + dividedConstraints.activatedItems.join(',\n\t')
 			: '';
 
 		const deactivatedConstraints = dividedConstraints?.deactivatedItems?.length
-			? '\n\t' + deactivatedItemsAsString
+			? deactivatedConstraintsPrefix + deactivatedItemsAsString
 			: '';
 
 		return activatedConstraints + deactivatedConstraints;

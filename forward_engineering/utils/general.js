@@ -135,6 +135,8 @@ module.exports = _ => {
 		}
 	};
 
+	const addCommaPrefix = (string, shouldAddComma) => (shouldAddComma ? `,${string}` : string);
+
 	const checkFieldPropertiesChanged = (compMod, propertiesToCheck) => {
 		return propertiesToCheck.some(prop => compMod?.oldField[prop] !== compMod?.newField[prop]);
 	};
@@ -297,5 +299,6 @@ module.exports = _ => {
 		getUdtName,
 		getSchemaOfAlterCollection,
 		getFullCollectionName,
+		addCommaPrefix
 	};
 };
