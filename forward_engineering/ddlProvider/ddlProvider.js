@@ -19,7 +19,7 @@ module.exports = (baseProvider, options, app) => {
 		getColumnsList,
 		getViewData,
 		wrapComment,
-		addCommaPrefix
+		addCommaPrefix,
 	} = require('../utils/general')(_);
 	const assignTemplates = require('../utils/assignTemplates');
 	const {
@@ -195,7 +195,8 @@ module.exports = (baseProvider, options, app) => {
 			const keyConstraintsValue = partitionOf ? keyConstraintsString?.slice(1) : keyConstraintsString;
 
 			const dividedForeignKeys = divideIntoActivatedAndDeactivated(foreignKeyConstraints, key => key.statement);
-			const shouldAddCommaPrefixToForeignKeysConstraints = !doKeyConstraintsHaveWarnings || checkConstraints.length !== 0;
+			const shouldAddCommaPrefixToForeignKeysConstraints =
+				!doKeyConstraintsHaveWarnings || checkConstraints.length !== 0;
 			const foreignKeyConstraintsString = generateConstraintsString({
 				dividedConstraints: dividedForeignKeys,
 				isParentActivated: isActivated,
@@ -205,7 +206,10 @@ module.exports = (baseProvider, options, app) => {
 			const columnDescriptions = '\n' + getColumnComments(tableName, columnDefinitions);
 			const template = partitionOf ? templates.createTablePartitionOf : templates.createTable;
 
-			const checkConstraintPrefix = partitionOf && !keyConstraintsString ? '\n\t' : `${addCommaPrefix('\n\t', !doKeyConstraintsHaveWarnings)}`;
+			const checkConstraintPrefix =
+				partitionOf && !keyConstraintsString
+					? '\n\t'
+					: `${addCommaPrefix('\n\t', !doKeyConstraintsHaveWarnings)}`;
 			const checkConstraintsValue = !_.isEmpty(checkConstraints)
 				? wrap(_.join(checkConstraints, ',\n\t'), checkConstraintPrefix, '')
 				: '';
@@ -471,8 +475,8 @@ module.exports = (baseProvider, options, app) => {
 				additionalPropertiesForForeignKey(customProperties);
 
 			const foreignKeyStatement = assignTemplates(templates.createForeignKey, {
-				primaryTable: getNamePrefixedWithSchemaName(primaryTable, primarySchemaName || schemaData.schemaName),
-				foreignTable: getNamePrefixedWithSchemaName(foreignTable, foreignSchemaName || schemaData.schemaName),
+				primaryTable: getNamePrefixedWithSchemaName(primaryTable, primarySchemaName || schemaData?.schemaName),
+				foreignTable: getNamePrefixedWithSchemaName(foreignTable, foreignSchemaName || schemaData?.schemaName),
 				name: name ? wrapInQuotes(name) : '',
 				foreignKey: areKeysActivated ? foreignKeysToString(foreignKey) : foreignActiveKeysToString(foreignKey),
 				primaryKey: areKeysActivated ? foreignKeysToString(primaryKey) : foreignActiveKeysToString(primaryKey),
