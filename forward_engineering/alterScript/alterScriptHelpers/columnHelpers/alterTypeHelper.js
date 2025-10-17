@@ -1,7 +1,12 @@
 const _ = require('lodash');
 const { AlterCollectionDto, AlterCollectionColumnDto } = require('../../types/AlterCollectionDto');
 const { AlterScriptDto } = require('../../types/AlterScriptDto');
-const { getFullTableName, checkFieldPropertiesChanged } = require('../../../utils/general');
+const {
+	getFullTableName,
+	checkFieldPropertiesChanged,
+	isObjectInDeltaModelActivated,
+	isParentContainerActivated,
+} = require('../../../utils/general');
 const { wrapInQuotes } = require('../../../../shared/wrapInQuotes');
 const ddlProvider = require('../../../ddlProvider/ddlProvider')();
 
@@ -42,6 +47,8 @@ const hasPrecisionOrScaleChanged = (collection, oldFieldName, currentJsonSchema)
  * */
 const getUpdateTypesScriptDtos = collection => {
 	const fullTableName = getFullTableName(collection);
+	const isContainerActivated = isParentContainerActivated(collection);
+	const isCollectionActivated = isObjectInDeltaModelActivated(collection);
 
 	return _.toPairs(collection.properties)
 		.filter(([name, jsonSchema]) => {
@@ -58,9 +65,13 @@ const getUpdateTypesScriptDtos = collection => {
 			const typeName = jsonSchema.compMod.newField.mode || jsonSchema.compMod.newField.type;
 			const columnName = wrapInQuotes(name);
 			const typeConfig = _.pick(jsonSchema, ['length', 'precision', 'scale']);
-			return ddlProvider.alterColumnType(fullTableName, columnName, typeName, typeConfig);
+			const isActivated = isContainerActivated && isCollectionActivated && jsonSchema.isActivated;
+			return {
+				script: ddlProvider.alterColumnType(fullTableName, columnName, typeName, typeConfig),
+				isActivated,
+			};
 		})
-		.map(scriptLine => AlterScriptDto.getInstance([scriptLine], true, false));
+		.map(({ script, isActivated }) => AlterScriptDto.getInstance([script], isActivated, false));
 };
 
 module.exports = {
