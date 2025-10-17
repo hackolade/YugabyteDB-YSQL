@@ -277,8 +277,8 @@ const isParentContainerActivated = collection => {
 };
 
 const getDbVersion = (dbVersion = '') => {
-	const version = dbVersion.match(/\d+/);
-
+	const versionRegex = /\d+/;
+	const version = versionRegex.exec(dbVersion);
 	return Number(_.get(version, [0], 0));
 };
 
