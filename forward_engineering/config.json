@@ -291,7 +291,7 @@
 			"disabled": false,
 			"value": {
 				"inline": {
-					"default": true,
+					"default": false,
 					"disabled": true,
 					"disabledLabel": ""
 				},
