@@ -49,9 +49,9 @@ const foreignActiveKeysToString = keys => {
 const createKeyConstraint = (templates, isParentActivated) => keyData => {
 	const constraintName = wrapInQuotes(_.trim(keyData.name));
 	const isAllColumnsDeactivated = checkAllKeysDeactivated(keyData.columns || []);
-	const columns = !_.isEmpty(keyData.columns)
-		? getColumnsList(keyData.columns, isAllColumnsDeactivated, isParentActivated)
-		: '';
+	const columns = _.isEmpty(keyData.columns)
+		? ''
+		: getColumnsList(keyData.columns, isAllColumnsDeactivated, isParentActivated);
 	const includeNonKey = keyData.include.length
 		? ` INCLUDE${getColumnsList(keyData.include, isAllColumnsDeactivated, isParentActivated)}`
 		: '';
@@ -67,7 +67,7 @@ const createKeyConstraint = (templates, isParentActivated) => keyData => {
 			storageParameters,
 			tablespace,
 		}),
-		isActivated: !isAllColumnsDeactivated,
+		isActivated: !isAllColumnsDeactivated && isParentActivated,
 	};
 };
 

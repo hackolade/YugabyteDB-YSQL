@@ -271,6 +271,10 @@ const isObjectInDeltaModelActivated = modelObject => {
 };
 
 const isParentContainerActivated = collection => {
+	if (!collection?.compMod?.bucketId) {
+		// skip check for entities without container
+		return true;
+	}
 	return (
 		collection?.compMod?.bucketProperties?.isActivated ?? collection?.role?.compMod?.bucketProperties?.isActivated
 	);
