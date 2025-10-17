@@ -110,4 +110,9 @@ module.exports = {
 		'\tON ${tableName}\n' +
 		'${options}' +
 		'\tEXECUTE ${functionKey} ${functionName};\n',
+
+	updateColumnDefaultValue:
+		'ALTER TABLE IF EXISTS ${tableName} ALTER COLUMN ${columnName} SET DEFAULT ${defaultValue};',
+
+	dropColumnDefaultValue: 'ALTER TABLE IF EXISTS ${tableName} ALTER COLUMN ${columnName} DROP DEFAULT;',
 };

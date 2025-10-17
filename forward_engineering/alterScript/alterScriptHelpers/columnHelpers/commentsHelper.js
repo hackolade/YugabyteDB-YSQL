@@ -1,11 +1,14 @@
+const _ = require('lodash');
 const { AlterCollectionDto } = require('../../types/AlterCollectionDto');
 const { AlterScriptDto } = require('../../types/AlterScriptDto');
+const { getFullColumnName, wrapComment } = require('../../../utils/general');
+const ddlProvider = require('../../../ddlProvider/ddlProvider')();
 
 /**
- * @return {(collection:  AlterCollectionDto) => Array<AlterScriptDto> }
+ * @param collection {AlterCollectionDto}
+ * @return Array<AlterScriptDto>
  * */
-const getUpdatedCommentOnColumnScriptDtos = (_, ddlProvider) => collection => {
-	const { getFullColumnName, wrapComment } = require('../../../utils/general')(_);
+const getUpdatedCommentOnColumnScriptDtos = collection => {
 	return _.toPairs(collection.properties)
 		.filter(([name, jsonSchema]) => {
 			const newComment = jsonSchema.description;
@@ -23,11 +26,10 @@ const getUpdatedCommentOnColumnScriptDtos = (_, ddlProvider) => collection => {
 };
 
 /**
- * @return {(collection:  AlterCollectionDto) => Array<AlterScriptDto> }
+ * @param collection {AlterCollectionDto}
+ * @return Array<AlterScriptDto>
  * */
-const getDeletedCommentOnColumnScriptDtos = (_, ddlProvider) => collection => {
-	const { getFullColumnName } = require('../../../utils/general')(_);
-
+const getDeletedCommentOnColumnScriptDtos = collection => {
 	return _.toPairs(collection.properties)
 		.filter(([name, jsonSchema]) => {
 			const newComment = jsonSchema.description;
@@ -43,11 +45,12 @@ const getDeletedCommentOnColumnScriptDtos = (_, ddlProvider) => collection => {
 };
 
 /**
- * @return {(collection:  AlterCollectionDto) => Array<AlterScriptDto> }
+ * @param collection {AlterCollectionDto}
+ * @return Array<AlterScriptDto>
  * */
-const getModifiedCommentOnColumnScriptDtos = (_, ddlProvider) => collection => {
-	const updatedCommentScriptDtos = getUpdatedCommentOnColumnScriptDtos(_, ddlProvider)(collection);
-	const deletedCommentScriptDtos = getDeletedCommentOnColumnScriptDtos(_, ddlProvider)(collection);
+const getModifiedCommentOnColumnScriptDtos = collection => {
+	const updatedCommentScriptDtos = getUpdatedCommentOnColumnScriptDtos(collection);
+	const deletedCommentScriptDtos = getDeletedCommentOnColumnScriptDtos(collection);
 	return [...updatedCommentScriptDtos, ...deletedCommentScriptDtos];
 };
 

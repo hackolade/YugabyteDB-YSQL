@@ -1,4 +1,7 @@
 const { AlterScriptDto } = require('../../types/AlterScriptDto');
+const { wrapComment } = require('../../../utils/general');
+const { wrapInQuotes } = require('../../../../shared/wrapInQuotes');
+const ddlProvider = require('../../../ddlProvider/ddlProvider')();
 
 /**
  * @param container {Object}
@@ -12,11 +15,10 @@ const extractDescription = container => {
 };
 
 /**
- * @return {(container: Object) => AlterScriptDto | undefined}
+ * @param container {Object}
+ * @return {AlterScriptDto | undefined}
  * */
-const getUpsertCommentsScriptDto = (_, ddlProvider) => container => {
-	const { wrapComment, wrapInQuotes } = require('../../../utils/general')(_);
-
+const getUpsertCommentsScriptDto = container => {
 	const description = extractDescription(container);
 	if (description.new && description.new !== description.old) {
 		const wrappedComment = wrapComment(description.new);
@@ -28,11 +30,10 @@ const getUpsertCommentsScriptDto = (_, ddlProvider) => container => {
 };
 
 /**
- * @return {(container: Object) => AlterScriptDto | undefined}
+ * @param container {Object}
+ * @return {AlterScriptDto | undefined}
  * */
-const getDropCommentsScriptDto = (_, ddlProvider) => container => {
-	const { wrapInQuotes } = require('../../../utils/general')(_);
-
+const getDropCommentsScriptDto = container => {
 	const description = extractDescription(container);
 	if (description.old && !description.new) {
 		const wrappedSchemaName = wrapInQuotes(container.role.name);
@@ -43,11 +44,12 @@ const getDropCommentsScriptDto = (_, ddlProvider) => container => {
 };
 
 /**
- * @return {(container: Object) => AlterScriptDto[]}
+ * @param container {Object}
+ * @return Array<AlterScriptDto>
  * */
-const getModifySchemaCommentsScriptDtos = (_, ddlProvider) => container => {
-	const upsertCommentScriptDto = getUpsertCommentsScriptDto(_, ddlProvider)(container);
-	const dropCommentScriptDto = getDropCommentsScriptDto(_, ddlProvider)(container);
+const getModifySchemaCommentsScriptDtos = container => {
+	const upsertCommentScriptDto = getUpsertCommentsScriptDto(container);
+	const dropCommentScriptDto = getDropCommentsScriptDto(container);
 	return [upsertCommentScriptDto, dropCommentScriptDto].filter(Boolean);
 };
 

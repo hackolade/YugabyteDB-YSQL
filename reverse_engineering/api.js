@@ -1,5 +1,4 @@
-'use strict';
-
+const _ = require('lodash');
 const { createLogger } = require('./helpers/loggerHelper');
 const postgresService = require('./helpers/postgresService');
 
@@ -23,7 +22,6 @@ module.exports = {
 				logger,
 			});
 
-			postgresService.setDependencies(app);
 			await postgresService.connect(connectionInfo, sshService, postgresLogger);
 			await postgresService.pingDb();
 			await postgresService.logVersion();
@@ -47,7 +45,6 @@ module.exports = {
 				logger,
 			});
 
-			postgresService.setDependencies(app);
 			await postgresService.connect(connectionInfo, sshService, postgresLogger);
 			await postgresService.logVersion();
 
@@ -76,7 +73,6 @@ module.exports = {
 				logger,
 			});
 
-			postgresService.setDependencies(app);
 			await postgresService.connect(connectionInfo, sshService, postgresLogger);
 			await postgresService.logVersion();
 			const schemasNames = await postgresService.getAllSchemasNames();
@@ -168,21 +164,19 @@ module.exports = {
 								triggers,
 							};
 
-							const tablePackages = tables
-								.map(entityData => ({
-									dbName: schemaName,
-									collectionName: entityData.name,
-									documents: entityData.documents,
-									views: [],
-									emptyBucket: false,
-									entityLevel: entityData.entityLevel,
-									validation: {
-										jsonSchema: entityData.jsonSchema,
-									},
-									bucketInfo,
-									modelDefinitions,
-								}))
-								.sort(data => (app.require('lodash').isEmpty([]) ? -1 : 1));
+							const tablePackages = tables.map(entityData => ({
+								dbName: schemaName,
+								collectionName: entityData.name,
+								documents: entityData.documents,
+								views: [],
+								emptyBucket: false,
+								entityLevel: entityData.entityLevel,
+								validation: {
+									jsonSchema: entityData.jsonSchema,
+								},
+								bucketInfo,
+								modelDefinitions,
+							}));
 
 							if (views?.length) {
 								const viewPackage = {

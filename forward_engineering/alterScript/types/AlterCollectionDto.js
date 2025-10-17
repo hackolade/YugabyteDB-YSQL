@@ -406,10 +406,63 @@ class AlterCollectionDto {
 	GUID;
 }
 
+class AlterCollectionColumnKeyOptionDto {
+	/**
+	 * @type {string}
+	 * */
+	id;
+
+	/**
+	 * @type {string}
+	 * */
+	constraintName;
+
+	/**
+	 * @type {string}
+	 * */
+	indexStorageParameters;
+
+	/**
+	 * @type {string}
+	 * */
+	indexTablespace;
+
+	/**
+	 * @type {Array<{
+	 *     keyId: string,
+	 *     type?: string,
+	 * }>}
+	 * */
+	indexInclude;
+}
+
+class AlterCollectionRoleCompModUniqueKeyDto extends AlterCollectionColumnKeyOptionDto {
+	/**
+	 * @type {Array<{
+	 *   type: string,
+	 *   keyId: string,
+	 * }>}
+	 * */
+	compositeUniqueKey;
+}
+
+class AlterCollectionRoleCompModUniqueKey {
+	/**
+	 * @type {AlterCollectionRoleCompModUniqueKeyDto[] | undefined}
+	 * */
+	new;
+	/**
+	 * @type {AlterCollectionRoleCompModUniqueKeyDto[] | undefined}
+	 * */
+	old;
+}
+
 module.exports = {
 	AlterCollectionDto,
 	AlterCollectionRoleDto,
 	AlterCollectionColumnDto,
 	AlterCollectionRoleCompModPrimaryKey,
 	AlterCollectionRoleCompModPKDto,
+	AlterCollectionRoleCompModUniqueKeyDto,
+	AlterCollectionRoleCompModUniqueKey,
 };

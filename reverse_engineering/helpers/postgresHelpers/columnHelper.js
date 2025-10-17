@@ -1,8 +1,4 @@
-let _ = null;
-
-const setDependencies = app => {
-	_ = app.require('lodash');
-};
+const _ = require('lodash');
 
 const columnPropertiesMapper = {
 	column_default: 'default',
@@ -224,7 +220,7 @@ const setSubtypeFromSampledJsonValues = (columns, documents) => {
 const safeParse = json => {
 	try {
 		return JSON.parse(json);
-	} catch (error) {
+	} catch {
 		return {};
 	}
 };
@@ -251,7 +247,6 @@ const canHaveTimePrecision = columnDataType => {
 };
 
 module.exports = {
-	setDependencies,
 	mapColumnData,
 	setSubtypeFromSampledJsonValues,
 };

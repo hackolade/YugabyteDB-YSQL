@@ -1,41 +1,21 @@
+const _ = require('lodash');
 const { createClient } = require('./connectionHelper');
 const db = require('./db');
 const { getJsonSchema } = require('./getJsonSchema');
+const { mapColumnData, setSubtypeFromSampledJsonValues } = require('./postgresHelpers/columnHelper');
+const { clearEmptyPropertiesInObject } = require('./postgresHelpers/common');
+const { prepareForeignKeys } = require('./postgresHelpers/foreignKeysHelper');
+const { mapFunctionData, mapProcedureData } = require('./postgresHelpers/functionHelper');
 const {
-	setDependencies: setDependenciesInColumnHelper,
-	mapColumnData,
-	setSubtypeFromSampledJsonValues,
-} = require('./postgresHelpers/columnHelper');
-const {
-	setDependencies: setDependenciesInCommonHelper,
-	clearEmptyPropertiesInObject,
-} = require('./postgresHelpers/common');
-const {
-	setDependencies: setDependenciesInForeignKeysHelper,
-	prepareForeignKeys,
-} = require('./postgresHelpers/foreignKeysHelper');
-const {
-	setDependencies: setFunctionHelperDependencies,
-	mapFunctionData,
-	mapProcedureData,
-} = require('./postgresHelpers/functionHelper');
-const {
-	setDependencies: setDependenciesInTableHelper,
 	prepareTablePartition,
 	checkHaveJsonTypes,
 	prepareTableConstraints,
 	getSampleDocSize,
 	prepareTableLevelData,
 	prepareTableIndexes,
-	prepareTableInheritance,
 } = require('./postgresHelpers/tableHelper');
+const { getUserDefinedTypes, isTypeComposite } = require('./postgresHelpers/userDefinedTypesHelper');
 const {
-	setDependencies: setDependenciesInUserDefinedTypesHelper,
-	getUserDefinedTypes,
-	isTypeComposite,
-} = require('./postgresHelpers/userDefinedTypesHelper');
-const {
-	setDependencies: setViewDependenciesInViewHelper,
 	isViewByTableType,
 	isViewByName,
 	removeViewNameSuffix,
@@ -43,28 +23,15 @@ const {
 	setViewSuffix,
 	prepareViewData,
 } = require('./postgresHelpers/viewHelper');
-const { setDependencies: setDependenciesInTriggerHelper, getTriggers } = require('./postgresHelpers/triggerHelper');
+const { getTriggers } = require('./postgresHelpers/triggerHelper');
 const queryConstants = require('./queryConstants');
 const { reorganizeConstraints } = require('./postgresHelpers/reorganizeConstraints');
 
 let isCurrentSshTunnel = false;
-let _ = null;
 let logger = null;
 let version = 14;
 
 module.exports = {
-	setDependencies(app) {
-		_ = app.require('lodash');
-		setDependenciesInCommonHelper(app);
-		setDependenciesInTableHelper(app);
-		setDependenciesInColumnHelper(app);
-		setDependenciesInForeignKeysHelper(app);
-		setViewDependenciesInViewHelper(app);
-		setFunctionHelperDependencies(app);
-		setDependenciesInUserDefinedTypesHelper(app);
-		setDependenciesInTriggerHelper(app);
-	},
-
 	async connect(connectionInfo, sshService, specificLogger) {
 		if (db.isClientInitialized()) {
 			await this.disconnect(sshService);
@@ -240,13 +207,7 @@ module.exports = {
 		return getUserDefinedTypes(udtsWithColumns, domainTypesWithConstraints);
 	},
 
-	async _retrieveSingleTableData(
-		recordSamplingSettings,
-		schemaOid,
-		schemaName,
-		userDefinedTypes,
-		{ tableName, isParentPartitioned },
-	) {
+	async _retrieveSingleTableData(recordSamplingSettings, schemaOid, schemaName, userDefinedTypes, { tableName }) {
 		logger.progress('Get table data', schemaName, tableName);
 
 		const tableLevelData = await db.queryTolerant(
@@ -264,7 +225,6 @@ module.exports = {
 		const partitionResult = await db.queryTolerant(queryConstants.GET_TABLE_PARTITION_DATA, [tableOid], true);
 		const tableColumns = await this._getTableColumns(tableName, schemaName, tableOid);
 		const descriptionResult = await db.queryTolerant(queryConstants.GET_DESCRIPTION_BY_OID, [tableOid], true);
-		//const inheritsResult = await db.queryTolerant(queryConstants.GET_INHERITS_PARENT_TABLE_NAME, [tableOid]);
 		const tableConstraintsResult = await db.queryTolerant(queryConstants.GET_TABLE_CONSTRAINTS, [tableOid]);
 		const tableIndexesResult = await db.queryTolerant(getGetIndexesQuery(version), [tableOid]);
 		const tableForeignKeys = await db.queryTolerant(queryConstants.GET_TABLE_FOREIGN_KEYS, [tableOid]);
@@ -277,7 +237,6 @@ module.exports = {
 		const partitioning = prepareTablePartition(partitionResult, tableColumns);
 		const tableLevelProperties = prepareTableLevelData(tableLevelData, tableToastOptions);
 		const description = getDescriptionFromResult(descriptionResult);
-		//const inherits = prepareTableInheritance(schemaName, inheritsResult);
 		const tableConstraint = prepareTableConstraints(tableConstraintsResult, tableColumns);
 		const tableIndexes = prepareTableIndexes(tableIndexesResult);
 		const relationships = prepareForeignKeys(tableForeignKeys, tableName, schemaName, tableColumns);
@@ -323,10 +282,10 @@ module.exports = {
 			tableOid,
 		]);
 
-		return _.map(tableColumns, (columnData, index) => {
+		return _.map(tableColumns, columnData => {
 			return {
 				...columnData,
-				...(_.find(tableColumnsAdditionalData, { name: columnData.column_name }) || {}),
+				..._.find(tableColumnsAdditionalData, { name: columnData.column_name }),
 			};
 		});
 	},
@@ -420,12 +379,12 @@ const isSystemSchema = schema_name => {
 	return false;
 };
 
-const getGetIndexesQuery = postgreVersion => {
-	return postgreVersion === 10 ? queryConstants.GET_TABLE_INDEXES_V_10 : queryConstants.GET_TABLE_INDEXES;
+const getGetIndexesQuery = postgresVersion => {
+	return postgresVersion === 10 ? queryConstants.GET_TABLE_INDEXES_V_10 : queryConstants.GET_TABLE_INDEXES;
 };
 
-const getGetFunctionsAdditionalDataQuery = postgreVersion => {
-	return postgreVersion === 10
+const getGetFunctionsAdditionalDataQuery = postgresVersion => {
+	return postgresVersion === 10
 		? queryConstants.GET_FUNCTIONS_WITH_PROCEDURES_ADDITIONAL_V_10
 		: queryConstants.GET_FUNCTIONS_WITH_PROCEDURES_ADDITIONAL;
 };

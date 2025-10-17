@@ -1,4 +1,6 @@
 const { AlterScriptDto } = require('../../types/AlterScriptDto');
+const { getFullViewName, wrapComment } = require('../../../utils/general');
+const ddlProvider = require('../../../ddlProvider/ddlProvider')();
 
 /**
  * @param view {Object}
@@ -12,11 +14,10 @@ const extractDescription = view => {
 };
 
 /**
- * @return {(view: Object) => AlterScriptDto | undefined}
+ * @param view {Object}
+ * @return {AlterScriptDto | undefined}
  * */
-const getUpsertCommentsScriptDto = (_, ddlProvider) => view => {
-	const { getFullViewName, wrapComment } = require('../../../utils/general')(_);
-
+const getUpsertCommentsScriptDto = view => {
 	const description = extractDescription(view);
 	if (description.new && description.new !== description.old) {
 		const wrappedComment = wrapComment(description.new);
@@ -28,11 +29,11 @@ const getUpsertCommentsScriptDto = (_, ddlProvider) => view => {
 };
 
 /**
- * @return {(view: Object) => AlterScriptDto | undefined}
+ * @param view {Object}
+ * @return {AlterScriptDto | undefined}
  * */
-const getDropCommentsScriptDto = (_, ddlProvider) => view => {
+const getDropCommentsScriptDto = view => {
 	const description = extractDescription(view);
-	const { getFullViewName } = require('../../../utils/general')(_);
 
 	if (description.old && !description.new) {
 		const viewName = getFullViewName(view);
@@ -43,11 +44,12 @@ const getDropCommentsScriptDto = (_, ddlProvider) => view => {
 };
 
 /**
- * @return {(view: Object) => AlterScriptDto[]}
+ * @param view {Object}
+ * @return {Array<AlterScriptDto>}
  * */
-const getModifyViewCommentsScriptDtos = (_, ddlProvider) => view => {
-	const upsertCommentScriptDto = getUpsertCommentsScriptDto(_, ddlProvider)(view);
-	const dropCommentScriptDto = getDropCommentsScriptDto(_, ddlProvider)(view);
+const getModifyViewCommentsScriptDtos = view => {
+	const upsertCommentScriptDto = getUpsertCommentsScriptDto(view);
+	const dropCommentScriptDto = getDropCommentsScriptDto(view);
 	return [upsertCommentScriptDto, dropCommentScriptDto].filter(Boolean);
 };
 
