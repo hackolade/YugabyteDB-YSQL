@@ -7,7 +7,13 @@ const {
 	AlterCollectionColumnPrimaryKeyOptionDto,
 	AlterCollectionRoleCompModPrimaryKey,
 } = require('../../types/AlterCollectionDto');
-const { getFullCollectionName, getSchemaOfAlterCollection, getEntityName } = require('../../../utils/general');
+const {
+	getFullCollectionName,
+	getSchemaOfAlterCollection,
+	getEntityName,
+	isParentContainerActivated,
+	isObjectInDeltaModelActivated,
+} = require('../../../utils/general');
 const { wrapInQuotes } = require('../../../../shared/wrapInQuotes');
 const ddlProvider = require('../../../ddlProvider/ddlProvider')();
 
@@ -242,9 +248,7 @@ const getConstraintNameForCompositePk = (primaryKey, entityName) => {
 const getCreateCompositePKDDLProviderConfig = (primaryKey, entityName, entity) => {
 	const constraintName = getConstraintNameForCompositePk(primaryKey, entityName);
 	const pkColumns = _.toPairs(entity.role.properties)
-		.filter(([name, jsonSchema]) =>
-			Boolean(primaryKey.compositePrimaryKey.find(keyDto => keyDto.keyId === jsonSchema.GUID)),
-		)
+		.filter(([name, jsonSchema]) => primaryKey.compositePrimaryKey.some(keyDto => keyDto.keyId === jsonSchema.GUID))
 		.map(([name, jsonSchema]) => ({
 			name,
 			isActivated: jsonSchema.isActivated,
@@ -261,9 +265,7 @@ const getCreateCompositePKDDLProviderConfig = (primaryKey, entityName, entity) =
 	}
 	if (primaryKey.indexInclude) {
 		includeColumns = _.toPairs(entity.role.properties)
-			.filter(([name, jsonSchema]) =>
-				Boolean(primaryKey.indexInclude.find(keyDto => keyDto.keyId === jsonSchema.GUID)),
-			)
+			.filter(([name, jsonSchema]) => primaryKey.indexInclude.some(keyDto => keyDto.keyId === jsonSchema.GUID))
 			.map(([name, jsonSchema]) => ({
 				name,
 				isActivated: jsonSchema.isActivated,
@@ -309,10 +311,13 @@ const getAddCompositePkScriptDtos = collection => {
 	const fullTableName = getFullCollectionName(collectionSchema);
 	const entityName = getEntityName(collectionSchema);
 
+	const isContainerActivated = isParentContainerActivated(collection);
+	const isCollectionActivated = isContainerActivated && isObjectInDeltaModelActivated(collection);
+
 	return newPrimaryKeys
 		.map(newPk => {
 			const ddlConfig = getCreateCompositePKDDLProviderConfig(newPk, entityName, collection);
-			const statementDto = ddlProvider.createKeyConstraint(fullTableName, collection.isActivated, ddlConfig);
+			const statementDto = ddlProvider.createKeyConstraint(fullTableName, isCollectionActivated, ddlConfig);
 			return new PkScriptModificationDto(statementDto.statement, fullTableName, false, statementDto.isActivated);
 		})
 		.filter(scriptDto => Boolean(scriptDto.script));
@@ -344,6 +349,9 @@ const getDropCompositePkScriptDtos = collection => {
 	const fullTableName = getFullCollectionName(collectionSchema);
 	const entityName = getEntityName(collectionSchema);
 
+	const isContainerActivated = isParentContainerActivated(collection);
+	const isCollectionActivated = isContainerActivated && isObjectInDeltaModelActivated(collection);
+
 	return oldPrimaryKeys
 		.map(oldPk => {
 			let constraintName = getDefaultConstraintName(entityName);
@@ -352,7 +360,7 @@ const getDropCompositePkScriptDtos = collection => {
 			}
 			const ddlConstraintName = wrapInQuotes(constraintName);
 			const script = ddlProvider.dropPkConstraint(fullTableName, ddlConstraintName);
-			return new PkScriptModificationDto(script, fullTableName, true, collection.isActivated);
+			return new PkScriptModificationDto(script, fullTableName, true, isCollectionActivated);
 		})
 		.filter(scriptDto => Boolean(scriptDto.script));
 };
@@ -434,7 +442,7 @@ const getCreateRegularPKDDLProviderConfig = (columnName, columnJsonSchema, entit
 		if (constraintOption.indexInclude) {
 			includeColumns = _.toPairs(entity.role.properties)
 				.filter(([name, jsonSchema]) =>
-					Boolean(constraintOption.indexInclude.find(keyDto => keyDto.keyId === jsonSchema.GUID)),
+					constraintOption.indexInclude.some(keyDto => keyDto.keyId === jsonSchema.GUID),
 				)
 				.map(([name, jsonSchema]) => ({
 					name,
@@ -619,6 +627,9 @@ const getAddPkScriptDtos = collection => {
 	const fullTableName = getFullCollectionName(collectionSchema);
 	const entityName = getEntityName(collectionSchema);
 
+	const isContainerActivated = isParentContainerActivated(collection);
+	const isCollectionActivated = isContainerActivated && isObjectInDeltaModelActivated(collection);
+
 	return _.toPairs(collection.properties)
 		.filter(([name, jsonSchema]) => {
 			if (wasFieldChangedToBeARegularPk(jsonSchema, collection)) {
@@ -635,7 +646,7 @@ const getAddPkScriptDtos = collection => {
 		})
 		.map(([name, jsonSchema]) => {
 			const ddlConfig = getCreateRegularPKDDLProviderConfig(name, jsonSchema, entityName, collection);
-			const statementDto = ddlProvider.createKeyConstraint(fullTableName, collection.isActivated, ddlConfig);
+			const statementDto = ddlProvider.createKeyConstraint(fullTableName, isCollectionActivated, ddlConfig);
 			return new PkScriptModificationDto(statementDto.statement, fullTableName, false, statementDto.isActivated);
 		})
 		.filter(scriptDto => Boolean(scriptDto.script));
@@ -649,6 +660,9 @@ const getDropPkScriptDto = collection => {
 	const collectionSchema = getSchemaOfAlterCollection(collection);
 	const fullTableName = getFullCollectionName(collectionSchema);
 	const entityName = getEntityName(collectionSchema);
+
+	const isContainerActivated = isParentContainerActivated(collection);
+	const isCollectionActivated = isContainerActivated && isObjectInDeltaModelActivated(collection);
 
 	return _.toPairs(collection.properties)
 		.filter(([name, jsonSchema]) => {
@@ -670,7 +684,7 @@ const getDropPkScriptDto = collection => {
 			const ddlConstraintName = wrapInQuotes(getConstraintNameForRegularPk(oldJsonSchema, entityName));
 
 			const script = ddlProvider.dropPkConstraint(fullTableName, ddlConstraintName);
-			return new PkScriptModificationDto(script, fullTableName, true, collection.isActivated);
+			return new PkScriptModificationDto(script, fullTableName, true, isCollectionActivated);
 		})
 		.filter(scriptDto => Boolean(scriptDto.script));
 };
@@ -699,7 +713,7 @@ const sortModifyPkConstraints = constraintDtos => {
 			return Number(c2.isDropScript) - Number(c1.isDropScript);
 		}
 		// This sorts all statements based on full table name, ASC
-		return c1.fullTableName < c2.fullTableName;
+		return c1.fullTableName.localeCompare(c2.fullTableName);
 	});
 };
 

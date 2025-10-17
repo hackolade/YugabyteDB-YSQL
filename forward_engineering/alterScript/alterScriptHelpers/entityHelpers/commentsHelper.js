@@ -1,6 +1,11 @@
 const { AlterCollectionDto } = require('../../types/AlterCollectionDto');
 const { AlterScriptDto } = require('../../types/AlterScriptDto');
-const { getFullTableName, wrapComment } = require('../../../utils/general');
+const {
+	getFullTableName,
+	wrapComment,
+	isObjectInDeltaModelActivated,
+	isParentContainerActivated,
+} = require('../../../utils/general');
 const ddlProvider = require('../../../ddlProvider/ddlProvider')();
 
 /**
@@ -21,8 +26,11 @@ const getUpdatedCommentOnCollectionScriptDto = collection => {
 	const tableName = getFullTableName(collection);
 	const comment = wrapComment(newComment);
 
+	const isContainerActivated = isParentContainerActivated(collection);
+	const isCollectionActivated = isContainerActivated && isObjectInDeltaModelActivated(collection);
+
 	const script = ddlProvider.updateTableComment(tableName, comment);
-	return AlterScriptDto.getInstance([script], true, false);
+	return AlterScriptDto.getInstance([script], isCollectionActivated, false);
 };
 
 /**
@@ -42,8 +50,11 @@ const getDeletedCommentOnCollectionScriptDto = collection => {
 
 	const tableName = getFullTableName(collection);
 
+	const isContainerActivated = isParentContainerActivated(collection);
+	const isCollectionActivated = isContainerActivated && isObjectInDeltaModelActivated(collection);
+
 	const script = ddlProvider.dropTableComment(tableName);
-	return AlterScriptDto.getInstance([script], true, true);
+	return AlterScriptDto.getInstance([script], isCollectionActivated, true);
 };
 
 /**

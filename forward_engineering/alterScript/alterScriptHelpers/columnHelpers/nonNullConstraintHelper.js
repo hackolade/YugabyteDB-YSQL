@@ -1,7 +1,11 @@
 const _ = require('lodash');
 const { AlterCollectionDto } = require('../../types/AlterCollectionDto');
 const { AlterScriptDto } = require('../../types/AlterScriptDto');
-const { getFullTableName } = require('../../../utils/general');
+const {
+	getFullTableName,
+	isObjectInDeltaModelActivated,
+	isParentContainerActivated,
+} = require('../../../utils/general');
 const { wrapInQuotes } = require('../../../../shared/wrapInQuotes');
 const ddlProvider = require('../../../ddlProvider/ddlProvider')();
 
@@ -11,6 +15,9 @@ const ddlProvider = require('../../../ddlProvider/ddlProvider')();
  * */
 const getModifyNonNullColumnsScriptDtos = collection => {
 	const fullTableName = getFullTableName(collection);
+
+	const isContainerActivated = isParentContainerActivated(collection);
+	const isCollectionActivated = isObjectInDeltaModelActivated(collection);
 
 	const currentRequiredColumnNames = collection.required || [];
 	const previousRequiredColumnNames = collection.role.required || [];
@@ -25,8 +32,12 @@ const getModifyNonNullColumnsScriptDtos = collection => {
 			const shouldAddForNewName = columnNamesToAddNotNullConstraint.includes(name);
 			return shouldAddForNewName && !shouldRemoveForOldName;
 		})
-		.map(([columnName]) => ddlProvider.setNotNullConstraint(fullTableName, wrapInQuotes(columnName)))
-		.map(scriptLine => AlterScriptDto.getInstance([scriptLine], true, false));
+		.map(([columnName, jsonSchema]) => {
+			const isActivated = isContainerActivated && isCollectionActivated && jsonSchema.isActivated;
+			const script = ddlProvider.setNotNullConstraint(fullTableName, wrapInQuotes(columnName));
+			return { script, isActivated };
+		})
+		.map(({ script, isActivated }) => AlterScriptDto.getInstance([script], isActivated, false));
 
 	const removeNotNullConstraintDtos = _.toPairs(collection.properties)
 		.filter(([name, jsonSchema]) => {
@@ -35,8 +46,12 @@ const getModifyNonNullColumnsScriptDtos = collection => {
 			const shouldAddForNewName = columnNamesToAddNotNullConstraint.includes(name);
 			return shouldRemoveForOldName && !shouldAddForNewName;
 		})
-		.map(([name]) => ddlProvider.dropNotNullConstraint(fullTableName, wrapInQuotes(name)))
-		.map(scriptLine => AlterScriptDto.getInstance([scriptLine], true, true));
+		.map(([name, jsonSchema]) => {
+			const isActivated = isContainerActivated && isCollectionActivated && jsonSchema.isActivated;
+			const script = ddlProvider.dropNotNullConstraint(fullTableName, wrapInQuotes(name));
+			return { script, isActivated };
+		})
+		.map(({ script, isActivated }) => AlterScriptDto.getInstance([script], isActivated, true));
 
 	return [...addNotNullConstraintsScripDtos, ...removeNotNullConstraintDtos];
 };
