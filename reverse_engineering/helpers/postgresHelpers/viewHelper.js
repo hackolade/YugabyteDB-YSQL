@@ -1,10 +1,6 @@
-const { clearEmptyPropertiesInObject, wrapInQuotes } = require('./common');
-
-let _ = null;
-
-const setDependencies = app => {
-	_ = app.require('lodash');
-};
+const _ = require('lodash');
+const { clearEmptyPropertiesInObject } = require('./common');
+const { wrapInQuotes } = require('../../../shared/wrapInQuotes');
 
 const VIEW_SUFFIX = ' (v)';
 
@@ -52,7 +48,6 @@ const isViewRecursive = viewData => {
 const splitByEqualitySymbol = item => _.split(item, '=');
 
 module.exports = {
-	setDependencies,
 	isViewByTableType,
 	isViewByName,
 	removeViewNameSuffix,

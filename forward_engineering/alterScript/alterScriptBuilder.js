@@ -1,14 +1,15 @@
 const { getAlterScriptDtos } = require('./alterScriptFromDeltaHelper');
-
 const { AlterScriptDto } = require('./types/AlterScriptDto');
+const { commentIfDeactivated } = require('../utils/general');
 
 /**
- * @return {(dtos: AlterScriptDto[], shouldApplyDropStatements: boolean) => string}
+ * @param dtos {Array<AlterScriptDto>}
+ * @param shouldApplyDropStatements {boolean}
+ * @return string
  * */
-const joinAlterScriptDtosIntoScript = _ => (dtos, shouldApplyDropStatements) => {
-	const { commentIfDeactivated } = require('../utils/general')(_);
+const joinAlterScriptDtosIntoScript = (dtos, shouldApplyDropStatements) => {
 	return dtos
-		.map(dto => {
+		.flatMap(dto => {
 			if (dto.isActivated === false) {
 				return dto.scripts.map(scriptDto =>
 					commentIfDeactivated(scriptDto.script, {
@@ -27,9 +28,7 @@ const joinAlterScriptDtosIntoScript = _ => (dtos, shouldApplyDropStatements) => 
 			}
 			return dto.scripts.map(scriptDto => scriptDto.script);
 		})
-		.flat()
-		.filter(Boolean)
-		.map(scriptLine => scriptLine.trim())
+		.map(scriptLine => scriptLine?.trim())
 		.filter(Boolean)
 		.join('\n\n');
 };
@@ -40,13 +39,12 @@ const joinAlterScriptDtosIntoScript = _ => (dtos, shouldApplyDropStatements) => 
  * @return {string}
  * */
 const buildEntityLevelAlterScript = (data, app) => {
-	const _ = app.require('lodash');
 	const alterScriptDtos = getAlterScriptDtos(data, app);
 	const shouldApplyDropStatements = data.options?.additionalOptions?.some(
 		option => option.id === 'applyDropStatements' && option.value,
 	);
 
-	return joinAlterScriptDtosIntoScript(_)(alterScriptDtos, shouldApplyDropStatements);
+	return joinAlterScriptDtosIntoScript(alterScriptDtos, shouldApplyDropStatements);
 };
 
 /**
@@ -78,13 +76,12 @@ const mapCoreDataForContainerLevelScripts = data => {
  * */
 const buildContainerLevelAlterScript = (data, app) => {
 	const preparedData = mapCoreDataForContainerLevelScripts(data);
-	const _ = app.require('lodash');
 	const alterScriptDtos = getAlterScriptDtos(preparedData, app);
 	const shouldApplyDropStatements = preparedData.options?.additionalOptions?.some(
 		option => option.id === 'applyDropStatements' && option.value,
 	);
 
-	return joinAlterScriptDtosIntoScript(_)(alterScriptDtos, shouldApplyDropStatements);
+	return joinAlterScriptDtosIntoScript(alterScriptDtos, shouldApplyDropStatements);
 };
 
 /**

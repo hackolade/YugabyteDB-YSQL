@@ -1,105 +1,46 @@
+const _ = require('lodash');
+const assignTemplates = require('../utils/assignTemplates');
 const defaultTypes = require('../configs/defaultTypes');
 const descriptors = require('../configs/descriptors');
+const keyHelper = require('./ddlHelpers/keyHelper');
 const templates = require('./templates');
+const {
+	decorateType,
+	decorateDefault,
+	getColumnComments,
+	replaceTypeByVersion,
+} = require('./ddlHelpers/columnDefinitionHelper');
+const {
+	generateConstraintsString,
+	foreignKeysToString,
+	foreignActiveKeysToString,
+	createKeyConstraint,
+	getConstraintsWarnings,
+	additionalPropertiesForForeignKey,
+} = require('./ddlHelpers/constraintsHelper');
+const { getFunctionsScript } = require('./ddlHelpers/functionHelper');
+const { getIndexKeys, getIndexOptions } = require('./ddlHelpers/indexHelper');
+const { getLocaleProperties } = require('./ddlHelpers/databaseHelper');
+const { getProceduresScript } = require('./ddlHelpers/procedureHelper');
+const { getTableTemporaryValue, getTableOptions } = require('./ddlHelpers/tableHelper');
+const { getTriggersScript, hydrateTriggers } = require('./ddlHelpers/triggerHelper');
+const { getUserDefinedType, isNotPlainType } = require('./ddlHelpers/udtHelper');
 const { joinActivatedAndDeactivatedStatements } = require('../utils/joinActivatedAndDeactivatedStatements');
+const {
+	tab,
+	commentIfDeactivated,
+	checkAllKeysDeactivated,
+	divideIntoActivatedAndDeactivated,
+	hasType,
+	wrap,
+	getNamePrefixedWithSchemaName,
+	getViewData,
+	wrapComment,
+	addCommaPrefix,
+} = require('../utils/general');
+const { wrapInQuotes } = require('../../shared/wrapInQuotes');
 
 module.exports = (baseProvider, options, app) => {
-	const _ = app.require('lodash');
-	const {
-		tab,
-		commentIfDeactivated,
-		checkAllKeysDeactivated,
-		divideIntoActivatedAndDeactivated,
-		hasType,
-		wrap,
-		clean,
-		getFunctionArguments,
-		wrapInQuotes,
-		getNamePrefixedWithSchemaName,
-		getColumnsList,
-		getViewData,
-		wrapComment,
-		addCommaPrefix,
-	} = require('../utils/general')(_);
-	const assignTemplates = require('../utils/assignTemplates');
-	const {
-		generateConstraintsString,
-		foreignKeysToString,
-		foreignActiveKeysToString,
-		createKeyConstraint,
-		getConstraintsWarnings,
-		additionalPropertiesForForeignKey,
-	} = require('./ddlHelpers/constraintsHelper')({
-		_,
-		commentIfDeactivated,
-		checkAllKeysDeactivated,
-		assignTemplates,
-		getColumnsList,
-		wrapInQuotes,
-	});
-	const keyHelper = require('./ddlHelpers/keyHelper')(_, clean);
-
-	const { getFunctionsScript } = require('./ddlHelpers/functionHelper')({
-		_,
-		templates,
-		assignTemplates,
-		getFunctionArguments,
-		getNamePrefixedWithSchemaName,
-		wrapComment,
-	});
-
-	const { getProceduresScript } = require('./ddlHelpers/procedureHelper')({
-		_,
-		templates,
-		assignTemplates,
-		getFunctionArguments,
-		getNamePrefixedWithSchemaName,
-	});
-
-	const { getTableTemporaryValue, getTableOptions } = require('./ddlHelpers/tableHelper')({
-		_,
-		checkAllKeysDeactivated,
-		getColumnsList,
-	});
-
-	const { getUserDefinedType, isNotPlainType } = require('./ddlHelpers/udtHelper')({
-		_,
-		commentIfDeactivated,
-		assignTemplates,
-		templates,
-		getNamePrefixedWithSchemaName,
-		wrapComment,
-	});
-
-	const { getIndexKeys, getIndexOptions } = require('./ddlHelpers/indexHelper')({
-		_,
-		wrapInQuotes,
-		checkAllKeysDeactivated,
-		getColumnsList,
-	});
-
-	const { decorateType, decorateDefault, getColumnComments, replaceTypeByVersion } =
-		require('./ddlHelpers/columnDefinitionHelper')({
-			_,
-			wrap,
-			assignTemplates,
-			templates,
-			commentIfDeactivated,
-			wrapInQuotes,
-			wrapComment,
-		});
-
-	const { getTriggersScript, hydrateTriggers } = require('./ddlHelpers/triggerHelper')({
-		_,
-		wrap,
-		assignTemplates,
-		templates,
-		getNamePrefixedWithSchemaName,
-		commentIfDeactivated,
-	});
-
-	const { getLocaleProperties } = require('./ddlHelpers/databaseHelper')();
-
 	return {
 		createDatabase(modelData) {
 			if (!modelData.databaseName) {

@@ -1,11 +1,15 @@
+const _ = require('lodash');
 const { AlterCollectionDto } = require('../../types/AlterCollectionDto');
 const { AlterScriptDto } = require('../../types/AlterScriptDto');
+const { getFullTableName, checkFieldPropertiesChanged } = require('../../../utils/general');
+const { wrapInQuotes } = require('../../../../shared/wrapInQuotes');
+const ddlProvider = require('../../../ddlProvider/ddlProvider')();
 
 /**
- * @return {(collection:  AlterCollectionDto) => Array<AlterScriptDto> }
+ * @param collection {AlterCollectionDto}
+ * @return Array<AlterScriptDto>
  * */
-const getRenameColumnScriptDtos = (_, ddlProvider) => collection => {
-	const { getFullTableName, wrapInQuotes, checkFieldPropertiesChanged } = require('../../../utils/general')(_);
+const getRenameColumnScriptDtos = collection => {
 	const fullTableName = getFullTableName(collection);
 
 	return _.values(collection.properties)

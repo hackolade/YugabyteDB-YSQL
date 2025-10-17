@@ -1,5 +1,9 @@
+const _ = require('lodash');
 const { AlterCollectionDto, AlterCollectionColumnDto } = require('../../types/AlterCollectionDto');
 const { AlterScriptDto } = require('../../types/AlterScriptDto');
+const { getFullTableName, checkFieldPropertiesChanged } = require('../../../utils/general');
+const { wrapInQuotes } = require('../../../../shared/wrapInQuotes');
+const ddlProvider = require('../../../ddlProvider/ddlProvider')();
 
 /**
  * @param collection {AlterCollectionDto}
@@ -33,11 +37,10 @@ const hasPrecisionOrScaleChanged = (collection, oldFieldName, currentJsonSchema)
 };
 
 /**
- * @return {(collection:  AlterCollectionDto) => Array<AlterScriptDto> }
+ * @param collection {AlterCollectionDto}
+ * @return Array<AlterScriptDto>
  * */
-const getUpdateTypesScriptDtos = (_, ddlProvider) => collection => {
-	const { getFullTableName, checkFieldPropertiesChanged, wrapInQuotes } = require('../../../utils/general')(_);
-
+const getUpdateTypesScriptDtos = collection => {
 	const fullTableName = getFullTableName(collection);
 
 	return _.toPairs(collection.properties)

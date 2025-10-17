@@ -1,38 +1,35 @@
 const { AlterScriptDto } = require('../types/AlterScriptDto');
-
 const { getModifySchemaCommentsScriptDtos } = require('./containerHelpers/commentsHelper');
+const { wrapInQuotes } = require('../../../shared/wrapInQuotes');
+const ddlProvider = require('../../ddlProvider/ddlProvider')();
 
+/**
+ * @param containerName {string}
+ * @return AlterScriptDto
+ * */
 /**
  * @return {(name: string) => AlterScriptDto}
  * */
-const getAddContainerScriptDto = app => containerName => {
-	const _ = app.require('lodash');
-	const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
-	const { wrapInQuotes } = require('../../utils/general')(_);
+const getAddContainerScriptDto = containerName => {
 	const script = ddlProvider.createSchemaOnly(wrapInQuotes(containerName));
 	return AlterScriptDto.getInstance([script], true, false);
 };
 
 /**
- * @return {(name: string) => AlterScriptDto}
+ * @param containerName {string}
+ * @return AlterScriptDto
  * */
-const getDeleteContainerScriptDto = app => containerName => {
-	const _ = app.require('lodash');
-	const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
-	const { wrapInQuotes } = require('../../utils/general')(_);
-
+const getDeleteContainerScriptDto = containerName => {
 	const script = ddlProvider.dropSchema(wrapInQuotes(containerName));
 	return AlterScriptDto.getInstance([script], true, false);
 };
 
 /**
- * @return {(container: Object) => Array<AlterScriptDto>}
+ * @param container {Object}
+ * @return Array<AlterScriptDto>
  * */
-const getModifyContainerScriptDtos = app => container => {
-	const _ = app.require('lodash');
-	const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
-
-	const modifyCommentScripts = getModifySchemaCommentsScriptDtos(_, ddlProvider)(container);
+const getModifyContainerScriptDtos = container => {
+	const modifyCommentScripts = getModifySchemaCommentsScriptDtos(container);
 
 	return [...modifyCommentScripts];
 };

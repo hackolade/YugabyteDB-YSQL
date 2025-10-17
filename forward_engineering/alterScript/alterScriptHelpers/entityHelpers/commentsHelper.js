@@ -1,12 +1,13 @@
 const { AlterCollectionDto } = require('../../types/AlterCollectionDto');
 const { AlterScriptDto } = require('../../types/AlterScriptDto');
+const { getFullTableName, wrapComment } = require('../../../utils/general');
+const ddlProvider = require('../../../ddlProvider/ddlProvider')();
 
 /**
- * @return {(collection: AlterCollectionDto) => AlterScriptDto | undefined}
- */
-const getUpdatedCommentOnCollectionScriptDto = (_, ddlProvider) => collection => {
-	const { getFullTableName, wrapComment } = require('../../../utils/general')(_);
-
+ * @param collection {AlterCollectionDto}
+ * @return {AlterScriptDto | undefined}
+ * */
+const getUpdatedCommentOnCollectionScriptDto = collection => {
 	const descriptionInfo = collection?.role.compMod?.description;
 	if (!descriptionInfo) {
 		return undefined;
@@ -25,11 +26,10 @@ const getUpdatedCommentOnCollectionScriptDto = (_, ddlProvider) => collection =>
 };
 
 /**
- * @return {(collection: AlterCollectionDto) => AlterScriptDto | undefined}
- */
-const getDeletedCommentOnCollectionScriptDto = (_, ddlProvider) => collection => {
-	const { getFullTableName } = require('../../../utils/general')(_);
-
+ * @param collection {AlterCollectionDto}
+ * @return {AlterScriptDto | undefined}
+ * */
+const getDeletedCommentOnCollectionScriptDto = collection => {
 	const descriptionInfo = collection?.role.compMod?.description;
 	if (!descriptionInfo) {
 		return '';
@@ -47,11 +47,12 @@ const getDeletedCommentOnCollectionScriptDto = (_, ddlProvider) => collection =>
 };
 
 /**
- * @return {(collection: AlterCollectionDto) => Array<AlterScriptDto>}
+ * @param collection {AlterCollectionDto}
+ * @return Array<AlterScriptDto>
  * */
-const getModifyEntityCommentsScriptDtos = (_, ddlProvider) => collection => {
-	const updatedCommentScriptDto = getUpdatedCommentOnCollectionScriptDto(_, ddlProvider)(collection);
-	const deletedCommentScriptDto = getDeletedCommentOnCollectionScriptDto(_, ddlProvider)(collection);
+const getModifyEntityCommentsScriptDtos = collection => {
+	const updatedCommentScriptDto = getUpdatedCommentOnCollectionScriptDto(collection);
+	const deletedCommentScriptDto = getDeletedCommentOnCollectionScriptDto(collection);
 
 	return [updatedCommentScriptDto, deletedCommentScriptDto].filter(Boolean);
 };

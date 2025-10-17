@@ -1,5 +1,4 @@
-'use strict';
-
+const _ = require('lodash');
 const { createLogger } = require('./helpers/loggerHelper');
 const postgresService = require('./helpers/postgresService');
 
@@ -23,7 +22,6 @@ module.exports = {
 				logger,
 			});
 
-			postgresService.setDependencies(app);
 			await postgresService.connect(connectionInfo, sshService, postgresLogger);
 			await postgresService.pingDb();
 			await postgresService.logVersion();
@@ -47,7 +45,6 @@ module.exports = {
 				logger,
 			});
 
-			postgresService.setDependencies(app);
 			await postgresService.connect(connectionInfo, sshService, postgresLogger);
 			await postgresService.logVersion();
 
@@ -76,7 +73,6 @@ module.exports = {
 				logger,
 			});
 
-			postgresService.setDependencies(app);
 			await postgresService.connect(connectionInfo, sshService, postgresLogger);
 			await postgresService.logVersion();
 			const schemasNames = await postgresService.getAllSchemasNames();
@@ -182,7 +178,11 @@ module.exports = {
 									bucketInfo,
 									modelDefinitions,
 								}))
-								.sort(data => (app.require('lodash').isEmpty([]) ? -1 : 1));
+								.sort(() => {
+									// originally there was a comparison on: `_.isEmpty(data.entityLevel.inherits) ? -1 : 1`
+									// however, Yugabyte doesn't support PostgreSQL-style table inheritance
+									return -1;
+								});
 
 							if (views?.length) {
 								const viewPackage = {

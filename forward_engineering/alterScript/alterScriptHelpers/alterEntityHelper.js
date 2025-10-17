@@ -1,6 +1,6 @@
+const _ = require('lodash');
 const { AlterCollectionDto } = require('../types/AlterCollectionDto');
 const { AlterScriptDto } = require('../types/AlterScriptDto');
-
 const { getModifyCheckConstraintScriptDtos } = require('./entityHelpers/checkConstraintHelper');
 const { getModifyEntityCommentsScriptDtos } = require('./entityHelpers/commentsHelper');
 const { getUpdateTypesScriptDtos } = require('./columnHelpers/alterTypeHelper');
@@ -8,6 +8,11 @@ const { getModifyNonNullColumnsScriptDtos } = require('./columnHelpers/nonNullCo
 const { getModifiedCommentOnColumnScriptDtos } = require('./columnHelpers/commentsHelper');
 const { getRenameColumnScriptDtos } = require('./columnHelpers/renameColumnHelper');
 const { getModifyPkConstraintsScriptDtos } = require('./entityHelpers/primaryKeyHelper');
+const { getEntityName, getFullTableName, getNamePrefixedWithSchemaName } = require('../../utils/general');
+const { wrapInQuotes } = require('../../../shared/wrapInQuotes');
+const { getModifiedDefaultColumnValueScriptDtos } = require('./columnHelpers/defaultValueHelper');
+const { getModifyUniqueKeyConstraintsScriptDtos } = require('./entityHelpers/uniqueKeyHelper');
+const ddlProvider = require('../../ddlProvider/ddlProvider')();
 
 /**
  * @return {(collection: AlterCollectionDto) => {AlterScriptDto} }
@@ -15,15 +20,12 @@ const { getModifyPkConstraintsScriptDtos } = require('./entityHelpers/primaryKey
 const getAddCollectionScriptDto =
 	({ app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions }) =>
 	collection => {
-		const _ = app.require('lodash');
-		const { getEntityName } = require('../../utils/general')(_);
 		const { createColumnDefinitionBySchema } = require('./createColumnDefinition')(app);
-		const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
 		const { getDefinitionByReference } = app.require('@hackolade/ddl-fe-utils');
 
 		const schemaName = collection.compMod.keyspaceName;
 		const schemaData = { schemaName, dbVersion };
-		const jsonSchema = { ...collection, ...(_.omit(collection?.role, 'properties') || {}) };
+		const jsonSchema = { ...collection, ..._.omit(collection?.role, 'properties') };
 		const columnDefinitions = _.toPairs(jsonSchema.properties).map(([name, column]) => {
 			const definitionJsonSchema = getDefinitionByReference({
 				propertySchema: column,
@@ -59,12 +61,10 @@ const getAddCollectionScriptDto =
 	};
 
 /**
- * @return {(collection: AlterCollectionDto) => AlterScriptDto}
+ * @param collection {AlterCollectionDto}
+ * @return AlterScriptDto
  * */
-const getDeleteCollectionScriptDto = app => collection => {
-	const _ = app.require('lodash');
-	const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
-	const { getFullTableName } = require('../../utils/general')(_);
+const getDeleteCollectionScriptDto = collection => {
 	const fullName = getFullTableName(collection);
 
 	const script = ddlProvider.dropTable(fullName);
@@ -72,18 +72,29 @@ const getDeleteCollectionScriptDto = app => collection => {
 };
 
 /**
- * @return {(collection: AlterCollectionDto) => Array<AlterScriptDto>}
+ * @param collection {AlterCollectionDto}
+ * @return {Array<AlterScriptDto>}
  * */
-const getModifyCollectionScriptDtos = app => collection => {
-	const _ = app.require('lodash');
-	const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
+const getModifyCollectionScriptDtos = collection => {
+	const modifyCheckConstraintScripts = getModifyCheckConstraintScriptDtos(collection);
+	const modifyCommentScripts = getModifyEntityCommentsScriptDtos(collection);
 
-	const modifyCheckConstraintScripts = getModifyCheckConstraintScriptDtos(_, ddlProvider)(collection);
-	const modifyCommentScripts = getModifyEntityCommentsScriptDtos(_, ddlProvider)(collection);
-	const modifyPKConstraintDtos = getModifyPkConstraintsScriptDtos(_, ddlProvider)(collection);
-
-	return [...modifyCheckConstraintScripts, ...modifyCommentScripts, ...modifyPKConstraintDtos];
+	return [...modifyCheckConstraintScripts, ...modifyCommentScripts];
 };
+
+/**
+ * @return {(collection: AlterCollectionDto) => AlterScriptDto[]}
+ * */
+const getModifyCollectionKeysScriptDtos =
+	({ dbVersion }) =>
+	collection => {
+		const modifyPKConstraintDtos = getModifyPkConstraintsScriptDtos(collection);
+		const modifyUniqueKeyConstraintDtos = getModifyUniqueKeyConstraintsScriptDtos({
+			collection,
+			dbVersion,
+		});
+		return [...modifyPKConstraintDtos, ...modifyUniqueKeyConstraintDtos].filter(Boolean);
+	};
 
 /**
  * @return {(collection: AlterCollectionDto) => Array<AlterScriptDto>}
@@ -91,13 +102,10 @@ const getModifyCollectionScriptDtos = app => collection => {
 const getAddColumnScriptDtos =
 	({ app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions }) =>
 	collection => {
-		const _ = app.require('lodash');
-		const { getEntityName, getNamePrefixedWithSchemaName } = require('../../utils/general')(_);
 		const { createColumnDefinitionBySchema } = require('./createColumnDefinition')(app);
-		const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
 		const { getDefinitionByReference } = app.require('@hackolade/ddl-fe-utils');
 
-		const collectionSchema = { ...collection, ...(_.omit(collection?.role, 'properties') || {}) };
+		const collectionSchema = { ...collection, ..._.omit(collection?.role, 'properties') };
 		const tableName = getEntityName(collectionSchema);
 		const schemaName = collectionSchema.compMod?.keyspaceName;
 		const fullName = getNamePrefixedWithSchemaName(tableName, schemaName);
@@ -128,14 +136,11 @@ const getAddColumnScriptDtos =
 	};
 
 /**
- * @return {(collection: AlterCollectionDto) => Array<AlterScriptDto>}
+ * @param collection {AlterCollectionDto}
+ * @return {Array<AlterScriptDto>}
  * */
-const getDeleteColumnScriptDtos = app => collection => {
-	const _ = app.require('lodash');
-	const { getEntityName, getNamePrefixedWithSchemaName, wrapInQuotes } = require('../../utils/general')(_);
-	const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
-
-	const collectionSchema = { ...collection, ...(_.omit(collection?.role, 'properties') || {}) };
+const getDeleteColumnScriptDtos = collection => {
+	const collectionSchema = { ...collection, ..._.omit(collection?.role, 'properties') };
 	const tableName = getEntityName(collectionSchema);
 	const schemaName = collectionSchema.compMod?.keyspaceName;
 	const fullName = getNamePrefixedWithSchemaName(tableName, schemaName);
@@ -147,18 +152,25 @@ const getDeleteColumnScriptDtos = app => collection => {
 };
 
 /**
- * @return {(collection: AlterCollectionDto) => Array<AlterScriptDto>}
+ * @param collection {AlterCollectionDto}
+ * @return {Array<AlterScriptDto>}
  * */
-const getModifyColumnScriptDtos = app => collection => {
-	const _ = app.require('lodash');
-	const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
+const getModifyColumnScriptDtos = collection => {
+	const renameColumnScriptDtos = getRenameColumnScriptDtos(collection);
+	const updateTypeScriptDtos = getUpdateTypesScriptDtos(collection);
+	const modifyNotNullScriptDtos = getModifyNonNullColumnsScriptDtos(collection);
+	const modifyCommentScriptDtos = getModifiedCommentOnColumnScriptDtos(collection);
+	const modifyDefaultColumnValueScriptDtos = getModifiedDefaultColumnValueScriptDtos({
+		collection,
+	});
 
-	const renameColumnScriptDtos = getRenameColumnScriptDtos(_, ddlProvider)(collection);
-	const updateTypeScriptDtos = getUpdateTypesScriptDtos(_, ddlProvider)(collection);
-	const modifyNotNullScriptDtos = getModifyNonNullColumnsScriptDtos(_, ddlProvider)(collection);
-	const modifyCommentScriptDtos = getModifiedCommentOnColumnScriptDtos(_, ddlProvider)(collection);
-
-	return [...renameColumnScriptDtos, ...updateTypeScriptDtos, ...modifyNotNullScriptDtos, ...modifyCommentScriptDtos];
+	return [
+		...renameColumnScriptDtos,
+		...updateTypeScriptDtos,
+		...modifyNotNullScriptDtos,
+		...modifyDefaultColumnValueScriptDtos,
+		...modifyCommentScriptDtos,
+	];
 };
 
 module.exports = {
@@ -168,4 +180,5 @@ module.exports = {
 	getAddColumnScriptDtos,
 	getDeleteColumnScriptDtos,
 	getModifyColumnScriptDtos,
+	getModifyCollectionKeysScriptDtos,
 };
