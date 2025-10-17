@@ -164,25 +164,19 @@ module.exports = {
 								triggers,
 							};
 
-							const tablePackages = tables
-								.map(entityData => ({
-									dbName: schemaName,
-									collectionName: entityData.name,
-									documents: entityData.documents,
-									views: [],
-									emptyBucket: false,
-									entityLevel: entityData.entityLevel,
-									validation: {
-										jsonSchema: entityData.jsonSchema,
-									},
-									bucketInfo,
-									modelDefinitions,
-								}))
-								.sort(() => {
-									// originally there was a comparison on: `_.isEmpty(data.entityLevel.inherits) ? -1 : 1`
-									// however, Yugabyte doesn't support PostgreSQL-style table inheritance
-									return -1;
-								});
+							const tablePackages = tables.map(entityData => ({
+								dbName: schemaName,
+								collectionName: entityData.name,
+								documents: entityData.documents,
+								views: [],
+								emptyBucket: false,
+								entityLevel: entityData.entityLevel,
+								validation: {
+									jsonSchema: entityData.jsonSchema,
+								},
+								bucketInfo,
+								modelDefinitions,
+							}));
 
 							if (views?.length) {
 								const viewPackage = {
