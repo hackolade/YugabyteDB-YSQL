@@ -16,7 +16,7 @@ module.exports = {
 		'${partitionOf} ${openParenthesis}${keyConstraints}${checkConstraints}${foreignKeyConstraints}\n' +
 		'${closeParenthesis}${options};\n\n${comment}${columnDescriptions}',
 
-	columnDefinition: '${name} ${type}${collation}${primaryKey}${uniqueKey}${defaultValue}${notNull}',
+	columnDefinition: '${name} ${type}${collation}${primaryKey}${uniqueKey}${defaultValue}${notNull}${checkConstraint}',
 
 	checkConstraint: '${name} CHECK (${expression})',
 

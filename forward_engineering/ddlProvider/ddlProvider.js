@@ -17,6 +17,7 @@ const {
 	createKeyConstraint,
 	getConstraintsWarnings,
 	additionalPropertiesForForeignKey,
+	cleanCheckConstraint,
 } = require('./ddlHelpers/constraintsHelper');
 const { getFunctionsScript } = require('./ddlHelpers/functionHelper');
 const { getIndexKeys, getIndexOptions } = require('./ddlHelpers/indexHelper');
@@ -209,8 +210,13 @@ module.exports = (baseProvider, options, app) => {
 				: '';
 			const collation = columnDefinition.collationRule ? ` COLLATE "${columnDefinition.collationRule}"` : '';
 			const isArrayType = Array.isArray(columnDefinition.array_type) && columnDefinition.array_type.length > 0;
-			const defaultValue = !_.isUndefined(columnDefinition.default)
-				? ' DEFAULT ' + decorateDefault(type, columnDefinition.default, isArrayType)
+			const defaultValue = _.isUndefined(columnDefinition.default)
+				? ''
+				: ' DEFAULT ' + decorateDefault(type, columnDefinition.default, isArrayType);
+
+			const checkConstraintData = _.first(columnDefinition.checkConstraint);
+			const checkConstraint = checkConstraintData?.expression
+				? ' ' + this.createCheckConstraint(checkConstraintData).trim()
 				: '';
 
 			return commentIfDeactivated(
@@ -222,6 +228,7 @@ module.exports = (baseProvider, options, app) => {
 					uniqueKey,
 					collation,
 					defaultValue,
+					checkConstraint,
 				}),
 				{
 					isActivated: columnDefinition.isActivated,
@@ -270,9 +277,11 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		createCheckConstraint(checkConstraint) {
+			const expression = cleanCheckConstraint(checkConstraint.expression);
+
 			return assignTemplates(templates.checkConstraint, {
 				name: checkConstraint.name ? `CONSTRAINT ${wrapInQuotes(checkConstraint.name)}` : '',
-				expression: _.trim(checkConstraint.expression).replace(/^\(([\s\S]*)\)$/, '$1'),
+				expression,
 			});
 		},
 
@@ -595,6 +604,7 @@ module.exports = (baseProvider, options, app) => {
 				uniqueKeyOptions,
 				nullable: columnDefinition.nullable,
 				default: columnDefinition.default,
+				checkConstraint: jsonSchema.checkConstraint,
 				comment: jsonSchema.refDescription || jsonSchema.description || definitionJsonSchema.description,
 				isActivated: columnDefinition.isActivated,
 				scale: columnDefinition.scale,

@@ -158,6 +158,13 @@ const dropKeyConstraint = (tableName, constraintName) => {
 	return assignTemplates(templates.dropConstraint, templatesConfig);
 };
 
+/**
+ * Cleans the check constraint expression by removing surrounding parentheses and trimming whitespace.
+ * @param expression {string}
+ * @returns string
+ */
+const cleanCheckConstraint = (expression = '') => _.trim(expression).replace(/^\(([\s\S]*)\)$/, '$1');
+
 module.exports = {
 	generateConstraintsString,
 	foreignKeysToString,
@@ -167,4 +174,5 @@ module.exports = {
 	additionalPropertiesForForeignKey,
 	dropKeyConstraint,
 	alterKeyConstraint,
+	cleanCheckConstraint,
 };

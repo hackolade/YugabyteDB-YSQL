@@ -12,6 +12,7 @@ const { getEntityName, getFullTableName, getNamePrefixedWithSchemaName } = requi
 const { wrapInQuotes } = require('../../../shared/wrapInQuotes');
 const { getModifiedDefaultColumnValueScriptDtos } = require('./columnHelpers/defaultValueHelper');
 const { getModifyUniqueKeyConstraintsScriptDtos } = require('./entityHelpers/uniqueKeyHelper');
+const { getModifyColumnCheckConstraintScriptDtos } = require('./columnHelpers/checkConstraintHelper');
 const ddlProvider = require('../../ddlProvider/ddlProvider')();
 
 /**
@@ -163,12 +164,14 @@ const getModifyColumnScriptDtos = collection => {
 	const modifyDefaultColumnValueScriptDtos = getModifiedDefaultColumnValueScriptDtos({
 		collection,
 	});
+	const modifyColumnCheckConstraintScriptDtos = getModifyColumnCheckConstraintScriptDtos(collection);
 
 	return [
 		...renameColumnScriptDtos,
 		...updateTypeScriptDtos,
 		...modifyNotNullScriptDtos,
 		...modifyDefaultColumnValueScriptDtos,
+		...modifyColumnCheckConstraintScriptDtos,
 		...modifyCommentScriptDtos,
 	];
 };
