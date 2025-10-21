@@ -587,6 +587,29 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
+				"propertyName": "Check constraint",
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					}
+				]
+			},
+			{
 				"propertyName": "Alternate Key",
 				"propertyKeyword": "alternateKey",
 				"defaultValue": false,
@@ -1085,6 +1108,29 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
+				"propertyName": "Check constraint",
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					}
+				]
+			},
+			{
 				"propertyName": "Alternate Key",
 				"propertyKeyword": "alternateKey",
 				"defaultValue": false,
@@ -1549,6 +1595,29 @@ making sure that you maintain a proper JSON format.
 						"addTimestampButton": false,
 						"propertyType": "details",
 						"template": "textarea"
+					}
+				]
+			},
+			{
+				"propertyName": "Check constraint",
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
 					}
 				]
 			},
@@ -2060,6 +2129,29 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
+				"propertyName": "Check constraint",
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					}
+				]
+			},
+			{
 				"propertyName": "Alternate Key",
 				"propertyKeyword": "alternateKey",
 				"defaultValue": false,
@@ -2133,6 +2225,29 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "required",
 				"enableForReference": true,
 				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "Check constraint",
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					}
+				]
 			},
 			{
 				"propertyName": "Alternate Key",
@@ -2587,6 +2702,29 @@ making sure that you maintain a proper JSON format.
 						"addTimestampButton": false,
 						"propertyType": "details",
 						"template": "textarea"
+					}
+				]
+			},
+			{
+				"propertyName": "Check constraint",
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
 					}
 				]
 			},
@@ -3065,6 +3203,29 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
+				"propertyName": "Check constraint",
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					}
+				]
+			},
+			{
 				"propertyName": "Alternate Key",
 				"propertyKeyword": "alternateKey",
 				"defaultValue": false,
@@ -3217,6 +3378,29 @@ making sure that you maintain a proper JSON format.
 				"addTimestampButton": true,
 				"propertyType": "details",
 				"template": "textarea"
+			},
+			{
+				"propertyName": "Check constraint",
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					}
+				]
 			},
 			{
 				"propertyName": "Alternate Key",
@@ -3661,6 +3845,29 @@ making sure that you maintain a proper JSON format.
 						"addTimestampButton": false,
 						"propertyType": "details",
 						"template": "textarea"
+					}
+				]
+			},
+			{
+				"propertyName": "Check constraint",
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
 					}
 				]
 			},
@@ -4115,6 +4322,29 @@ making sure that you maintain a proper JSON format.
 						"addTimestampButton": false,
 						"propertyType": "details",
 						"template": "textarea"
+					}
+				]
+			},
+			{
+				"propertyName": "Check constraint",
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
 					}
 				]
 			},
@@ -4594,6 +4824,29 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
+				"propertyName": "Check constraint",
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					}
+				]
+			},
+			{
 				"propertyName": "Alternate Key",
 				"propertyKeyword": "alternateKey",
 				"defaultValue": false,
@@ -4675,6 +4928,29 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "checkbox"
 			},
 			"pattern",
+			{
+				"propertyName": "Check constraint",
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					}
+				]
+			},
 			{
 				"propertyName": "Alternate Key",
 				"propertyKeyword": "alternateKey",
@@ -4803,6 +5079,29 @@ making sure that you maintain a proper JSON format.
 				"template": "textarea"
 			},
 			{
+				"propertyName": "Check constraint",
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					}
+				]
+			},
+			{
 				"propertyName": "Alternate Key",
 				"propertyKeyword": "alternateKey",
 				"defaultValue": false,
@@ -4879,6 +5178,29 @@ making sure that you maintain a proper JSON format.
 				"addTimestampButton": true,
 				"propertyType": "details",
 				"template": "textarea"
+			},
+			{
+				"propertyName": "Check constraint",
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					}
+				]
 			},
 			{
 				"propertyName": "Alternate Key",
@@ -4984,6 +5306,29 @@ making sure that you maintain a proper JSON format.
 						"value": true
 					}
 				]
+			},
+			{
+				"propertyName": "Check constraint",
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					}
+				]
 			}
 		],
 		"range_udt": [
@@ -5016,6 +5361,29 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "checkbox"
 			},
 			"default",
+			{
+				"propertyName": "Check constraint",
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					}
+				]
+			},
 			{
 				"propertyName": "Comments",
 				"propertyKeyword": "description",
