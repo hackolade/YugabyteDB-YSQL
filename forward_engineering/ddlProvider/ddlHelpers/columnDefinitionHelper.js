@@ -3,6 +3,7 @@ const { wrapComment, commentIfDeactivated } = require('../../utils/general');
 const assignTemplates = require('../../utils/assignTemplates');
 const templates = require('../templates');
 const { wrapInQuotes } = require('../../../shared/wrapInQuotes');
+const { createKeyConstraint, createCheckConstraint } = require('./constraintsHelper');
 
 const addLength = (type, length) => {
 	return `${type}(${length})`;
@@ -124,9 +125,47 @@ const replaceTypeByVersion = (type, dbVersion) => {
 	return replacedType || type;
 };
 
+const convertColumnDefinition = columnDefinition => {
+	const type = replaceTypeByVersion(columnDefinition.type, columnDefinition.dbVersion);
+	const notNull = columnDefinition.nullable ? '' : ' NOT NULL';
+	const primaryKey = columnDefinition.primaryKey
+		? ' ' + createKeyConstraint(templates, true)(columnDefinition.primaryKeyOptions).statement
+		: '';
+	const uniqueKey = columnDefinition.unique
+		? ' ' + createKeyConstraint(templates, true)(columnDefinition.uniqueKeyOptions).statement
+		: '';
+	const collation = columnDefinition.collationRule ? ` COLLATE "${columnDefinition.collationRule}"` : '';
+	const isArrayType = Array.isArray(columnDefinition.array_type) && columnDefinition.array_type.length > 0;
+	const defaultValue = _.isUndefined(columnDefinition.default)
+		? ''
+		: ' DEFAULT ' + decorateDefault(type, columnDefinition.default, isArrayType);
+
+	const checkConstraintData = _.first(columnDefinition.checkConstraint);
+	const checkConstraint = checkConstraintData?.expression
+		? ' ' + createCheckConstraint(checkConstraintData).trim()
+		: '';
+
+	return commentIfDeactivated(
+		assignTemplates(templates.columnDefinition, {
+			name: wrapInQuotes(columnDefinition.name),
+			type: decorateType(type, columnDefinition),
+			notNull,
+			primaryKey,
+			uniqueKey,
+			collation,
+			defaultValue,
+			checkConstraint,
+		}),
+		{
+			isActivated: columnDefinition.isActivated,
+		},
+	);
+};
+
 module.exports = {
 	decorateType,
 	decorateDefault,
 	getColumnComments,
 	replaceTypeByVersion,
+	convertColumnDefinition,
 };

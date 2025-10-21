@@ -4,12 +4,8 @@ const defaultTypes = require('../configs/defaultTypes');
 const descriptors = require('../configs/descriptors');
 const keyHelper = require('./ddlHelpers/keyHelper');
 const templates = require('./templates');
-const {
-	decorateType,
-	decorateDefault,
-	getColumnComments,
-	replaceTypeByVersion,
-} = require('./ddlHelpers/columnDefinitionHelper');
+const columnDefinitionHelper = require('./ddlHelpers/columnDefinitionHelper');
+const constraintsHelper = require('./ddlHelpers/constraintsHelper');
 const {
 	generateConstraintsString,
 	foreignKeysToString,
@@ -17,7 +13,6 @@ const {
 	createKeyConstraint,
 	getConstraintsWarnings,
 	additionalPropertiesForForeignKey,
-	cleanCheckConstraint,
 } = require('./ddlHelpers/constraintsHelper');
 const { getFunctionsScript } = require('./ddlHelpers/functionHelper');
 const { getIndexKeys, getIndexOptions } = require('./ddlHelpers/indexHelper');
@@ -145,7 +140,7 @@ module.exports = (baseProvider, options, app) => {
 				activatedConstraintsPrefix: addCommaPrefix('\n\t', shouldAddCommaPrefixToForeignKeysConstraints),
 			});
 
-			const columnDescriptions = '\n' + getColumnComments(tableName, columnDefinitions);
+			const columnDescriptions = '\n' + columnDefinitionHelper.getColumnComments(tableName, columnDefinitions);
 			const template = partitionOf ? templates.createTablePartitionOf : templates.createTable;
 
 			const checkConstraintPrefix =
@@ -200,40 +195,7 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		convertColumnDefinition(columnDefinition) {
-			const type = replaceTypeByVersion(columnDefinition.type, columnDefinition.dbVersion);
-			const notNull = columnDefinition.nullable ? '' : ' NOT NULL';
-			const primaryKey = columnDefinition.primaryKey
-				? ' ' + createKeyConstraint(templates, true)(columnDefinition.primaryKeyOptions).statement
-				: '';
-			const uniqueKey = columnDefinition.unique
-				? ' ' + createKeyConstraint(templates, true)(columnDefinition.uniqueKeyOptions).statement
-				: '';
-			const collation = columnDefinition.collationRule ? ` COLLATE "${columnDefinition.collationRule}"` : '';
-			const isArrayType = Array.isArray(columnDefinition.array_type) && columnDefinition.array_type.length > 0;
-			const defaultValue = _.isUndefined(columnDefinition.default)
-				? ''
-				: ' DEFAULT ' + decorateDefault(type, columnDefinition.default, isArrayType);
-
-			const checkConstraintData = _.first(columnDefinition.checkConstraint);
-			const checkConstraint = checkConstraintData?.expression
-				? ' ' + this.createCheckConstraint(checkConstraintData).trim()
-				: '';
-
-			return commentIfDeactivated(
-				assignTemplates(templates.columnDefinition, {
-					name: wrapInQuotes(columnDefinition.name),
-					type: decorateType(type, columnDefinition),
-					notNull,
-					primaryKey,
-					uniqueKey,
-					collation,
-					defaultValue,
-					checkConstraint,
-				}),
-				{
-					isActivated: columnDefinition.isActivated,
-				},
-			);
+			return columnDefinitionHelper.convertColumnDefinition(columnDefinition);
 		},
 
 		createIndex(tableName, index, dbData, isParentActivated = true) {
@@ -277,12 +239,7 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		createCheckConstraint(checkConstraint) {
-			const expression = cleanCheckConstraint(checkConstraint.expression);
-
-			return assignTemplates(templates.checkConstraint, {
-				name: checkConstraint.name ? `CONSTRAINT ${wrapInQuotes(checkConstraint.name)}` : '',
-				expression,
-			});
+			return constraintsHelper.createCheckConstraint(checkConstraint);
 		},
 
 		/**
@@ -524,7 +481,7 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		createUdt(udt) {
-			const columns = _.map(udt.properties, this.convertColumnDefinition);
+			const columns = _.map(udt.properties, columnDefinitionHelper.convertColumnDefinition);
 
 			return getUserDefinedType(udt, columns);
 		},

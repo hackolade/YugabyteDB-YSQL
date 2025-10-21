@@ -165,6 +165,15 @@ const dropKeyConstraint = (tableName, constraintName) => {
  */
 const cleanCheckConstraint = (expression = '') => _.trim(expression).replace(/^\(([\s\S]*)\)$/, '$1');
 
+const createCheckConstraint = checkConstraint => {
+	const expression = cleanCheckConstraint(checkConstraint.expression);
+
+	return assignTemplates(templates.checkConstraint, {
+		name: checkConstraint.name ? `CONSTRAINT ${wrapInQuotes(checkConstraint.name)}` : '',
+		expression,
+	});
+};
+
 module.exports = {
 	generateConstraintsString,
 	foreignKeysToString,
@@ -175,4 +184,5 @@ module.exports = {
 	dropKeyConstraint,
 	alterKeyConstraint,
 	cleanCheckConstraint,
+	createCheckConstraint,
 };
