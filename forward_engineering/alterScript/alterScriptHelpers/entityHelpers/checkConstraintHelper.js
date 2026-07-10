@@ -124,12 +124,12 @@ const getModifyCheckConstraintScriptDtos = collection => {
 	const dropCheckConstraintScriptDtos = getDropCheckConstraintScriptDtos(constraintHistory, fullTableName);
 	const updateCheckConstraintScriptDtos = getUpdateCheckConstraintScriptDtos(constraintHistory, fullTableName);
 
-	return [...addCheckConstraintScriptDtos, ...dropCheckConstraintScriptDtos, ...updateCheckConstraintScriptDtos].map(
-		dto => ({
+	return [...addCheckConstraintScriptDtos, ...dropCheckConstraintScriptDtos, ...updateCheckConstraintScriptDtos]
+		.filter(Boolean)
+		.map(dto => ({
 			...dto,
 			isActivated: isContainerActivated && isCollectionActivated,
-		}),
-	);
+		}));
 };
 
 module.exports = {
