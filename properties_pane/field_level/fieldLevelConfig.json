@@ -605,7 +605,10 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "Expression",
 						"propertyType": "details",
 						"template": "textarea",
-						"markdown": false
+						"markdown": false,
+						"validation": {
+							"required": true
+						}
 					}
 				]
 			},
@@ -1126,7 +1129,10 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "Expression",
 						"propertyType": "details",
 						"template": "textarea",
-						"markdown": false
+						"markdown": false,
+						"validation": {
+							"required": true
+						}
 					}
 				]
 			},
@@ -1617,7 +1623,10 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "Expression",
 						"propertyType": "details",
 						"template": "textarea",
-						"markdown": false
+						"markdown": false,
+						"validation": {
+							"required": true
+						}
 					}
 				]
 			},
@@ -2147,7 +2156,10 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "Expression",
 						"propertyType": "details",
 						"template": "textarea",
-						"markdown": false
+						"markdown": false,
+						"validation": {
+							"required": true
+						}
 					}
 				]
 			},
@@ -2245,7 +2257,10 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "Expression",
 						"propertyType": "details",
 						"template": "textarea",
-						"markdown": false
+						"markdown": false,
+						"validation": {
+							"required": true
+						}
 					}
 				]
 			},
@@ -2724,7 +2739,10 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "Expression",
 						"propertyType": "details",
 						"template": "textarea",
-						"markdown": false
+						"markdown": false,
+						"validation": {
+							"required": true
+						}
 					}
 				]
 			},
@@ -3221,7 +3239,10 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "Expression",
 						"propertyType": "details",
 						"template": "textarea",
-						"markdown": false
+						"markdown": false,
+						"validation": {
+							"required": true
+						}
 					}
 				]
 			},
@@ -3398,7 +3419,10 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "Expression",
 						"propertyType": "details",
 						"template": "textarea",
-						"markdown": false
+						"markdown": false,
+						"validation": {
+							"required": true
+						}
 					}
 				]
 			},
@@ -3867,7 +3891,10 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "Expression",
 						"propertyType": "details",
 						"template": "textarea",
-						"markdown": false
+						"markdown": false,
+						"validation": {
+							"required": true
+						}
 					}
 				]
 			},
@@ -4344,7 +4371,10 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "Expression",
 						"propertyType": "details",
 						"template": "textarea",
-						"markdown": false
+						"markdown": false,
+						"validation": {
+							"required": true
+						}
 					}
 				]
 			},
@@ -4842,7 +4872,10 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "Expression",
 						"propertyType": "details",
 						"template": "textarea",
-						"markdown": false
+						"markdown": false,
+						"validation": {
+							"required": true
+						}
 					}
 				]
 			},
@@ -4947,7 +4980,10 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "Expression",
 						"propertyType": "details",
 						"template": "textarea",
-						"markdown": false
+						"markdown": false,
+						"validation": {
+							"required": true
+						}
 					}
 				]
 			},
@@ -5097,7 +5133,10 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "Expression",
 						"propertyType": "details",
 						"template": "textarea",
-						"markdown": false
+						"markdown": false,
+						"validation": {
+							"required": true
+						}
 					}
 				]
 			},
@@ -5198,7 +5237,10 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "Expression",
 						"propertyType": "details",
 						"template": "textarea",
-						"markdown": false
+						"markdown": false,
+						"validation": {
+							"required": true
+						}
 					}
 				]
 			},
@@ -5326,7 +5368,10 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "Expression",
 						"propertyType": "details",
 						"template": "textarea",
-						"markdown": false
+						"markdown": false,
+						"validation": {
+							"required": true
+						}
 					}
 				]
 			}
@@ -5380,7 +5425,10 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "Expression",
 						"propertyType": "details",
 						"template": "textarea",
-						"markdown": false
+						"markdown": false,
+						"validation": {
+							"required": true
+						}
 					}
 				]
 			},
@@ -5570,7 +5618,10 @@ making sure that you maintain a proper JSON format.
 						"propertyKeyword": "expression",
 						"propertyType": "details",
 						"template": "textarea",
-						"markdown": false
+						"markdown": false,
+						"validation": {
+							"required": true
+						}
 					}
 				]
 			},
