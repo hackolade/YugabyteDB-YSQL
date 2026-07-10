@@ -771,10 +771,14 @@ module.exports = (baseProvider, options, app) => {
 		/**
 		 * @param tableName {string}
 		 * @param constraintName {string}
-		 * @param expression {expression}
+		 * @param expression {string}
 		 * @return string
 		 * */
 		addCheckConstraint(tableName, constraintName, expression) {
+			if (!expression?.trim?.()) {
+				return '';
+			}
+
 			const templateConfig = {
 				tableName,
 				constraintName,
