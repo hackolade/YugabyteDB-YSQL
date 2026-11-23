@@ -33,6 +33,8 @@ const {
 	getViewData,
 	wrapComment,
 	addCommaPrefix,
+	isViewColumnSourceActivated,
+	isViewActivated,
 } = require('../utils/general');
 const { wrapInQuotes } = require('../../shared/wrapInQuotes');
 
@@ -403,7 +405,7 @@ module.exports = (baseProvider, options, app) => {
 			};
 		},
 
-		createView(viewData, dbData, isActivated) {
+		createView(viewData, dbData, viewIsActivated) {
 			const viewName = getNamePrefixedWithSchemaName(viewData.name, viewData.schemaName);
 
 			const comment = assignTemplates(templates.comment, {
@@ -412,8 +414,8 @@ module.exports = (baseProvider, options, app) => {
 				comment: wrapComment(viewData.comment),
 			});
 
-			const allDeactivated = checkAllKeysDeactivated(viewData.keys || []);
-			const deactivatedWholeStatement = allDeactivated || !isActivated;
+			const isActivated = isViewActivated(viewData, { isActivated: viewIsActivated });
+			const deactivatedWholeStatement = !isActivated;
 			const { columns, tables } = getViewData(viewData.keys);
 			let columnsAsString = columns.map(column => column.statement).join(',\n\t\t');
 
@@ -665,7 +667,7 @@ module.exports = (baseProvider, options, app) => {
 				name: data.name,
 				tableName: data.entityName,
 				alias: data.alias,
-				isActivated: data.isActivated,
+				isActivated: data.isActivated !== false && isViewColumnSourceActivated(data),
 				dbName: data.dbName,
 			};
 		},
