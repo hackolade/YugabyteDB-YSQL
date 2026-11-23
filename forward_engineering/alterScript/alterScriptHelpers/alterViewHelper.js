@@ -1,6 +1,7 @@
 const { AlterScriptDto } = require('../types/AlterScriptDto');
 const { getModifyViewCommentsScriptDtos } = require('./viewHelpers/commentsHelper');
 const { wrapInQuotes } = require('../../../shared/wrapInQuotes');
+const { isViewActivated } = require('../../utils/general');
 const ddlProvider = require('../../ddlProvider/ddlProvider')();
 
 /**
@@ -15,8 +16,9 @@ const getAddViewScriptDto = view => {
 	};
 	const hydratedView = ddlProvider.hydrateView({ viewData, entityData: [view] });
 
-	const script = ddlProvider.createView(hydratedView, {}, view.isActivated);
-	return AlterScriptDto.getInstance([script], true, false);
+	const viewActivated = isViewActivated(view);
+	const script = ddlProvider.createView(hydratedView, {}, viewActivated);
+	return AlterScriptDto.getInstance([script], viewActivated, false);
 };
 
 /**
@@ -27,7 +29,7 @@ const getDeleteViewScriptDto = view => {
 	const viewName = wrapInQuotes(view.code || view.name);
 
 	const script = ddlProvider.dropView(viewName);
-	return AlterScriptDto.getInstance([script], true, true);
+	return AlterScriptDto.getInstance([script], isViewActivated(view), true);
 };
 
 /**
